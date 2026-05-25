@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios'); // We use axios to stream the data from Google Drive securely
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -8,11 +9,11 @@ const AUDIO_DIRECT_URL = "https://drive.usercontent.google.com/download?id=1fVyi
 // Helper function to log traffic directly to your Render dashboard logs
 function logTraffic(username, action, req) {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const time = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }); // Formatted to Indian Standard Time (IST)
+    const time = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }); // IST Time format
     console.log(`[${time}] User: ${username} | Action: ${action} | IP: ${ip}`);
 }
 
-// 1. The Main Page: Serves the Drive-like web player interface
+// 1. The Main Page: Serves the web player interface pointing to our internal stream route
 app.get('/', (req, res) => {
     const username = req.query.user || 'Unknown User';
     
@@ -79,7 +80,7 @@ app.get('/', (req, res) => {
             <div class="player-container">
                 <h3>Majboor.wav</h3>
                 <audio controls>
-                    <source src="${AUDIO_DIRECT_URL}" type="audio/wav">
+                    <source src="/stream-audio" type="audio/wav">
                     Your browser does not support the audio element.
                 </audio>
                 <br>
@@ -90,7 +91,28 @@ app.get('/', (req, res) => {
     `);
 });
 
-// 2. The Download Route: Logs the download intent and redirects to the file
+// 2. The Stream Route: Bypasses Google's blocking by serving the audio from your server
+app.get('/stream-audio', async (req, res) => {
+    try {
+        const response = await axios({
+            method: 'get',
+            url: AUDIO_DIRECT_URL,
+            responseType: 'stream',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+            }
+        });
+
+        // Forward the content type header so the browser knows it's a wav file
+        res.setHeader('Content-Type', 'audio/wav');
+        response.data.pipe(res);
+    } catch (error) {
+        console.error('Streaming error:', error.message);
+        res.status(500).send('Error streaming file');
+    }
+});
+
+// 3. The Download Route: Logs the download intent and redirects to the file
 app.get('/track-download', (req, res) => {
     const username = req.query.user || 'Unknown User';
     
