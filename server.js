@@ -49,7 +49,7 @@ app.get('/', (req, res) => {
             <div class="player-container">
                 <h3>Majboor.wav</h3>
                 <audio controls controlsList="nodownload">
-                    <source src="https://drive.google.com/file/d/1fVyiMjYwi_0ig2ImxzjNjRcslU9YMVFR/view?usp=sharing" type="audio/wav">
+                    <source src="https://drive.usercontent.google.com/download?id=1fVyiMjYwi_0ig2ImxzjNjRcslU9YMVFR&export=download&authuser=0" type="audio/wav">
                     Your browser does not support the audio element.
                 </audio>
                 <br>
