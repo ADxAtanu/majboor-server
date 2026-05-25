@@ -18,7 +18,7 @@ function logTraffic(username, action, req) {
 }
 
 // 1. The Main Link: Serves the web-player page (With LocalTunnel Warning Bypass)
-app.get('/listen', (req, res) => {
+app.get('/', (req, res) => {
     const username = req.query.user || 'Unknown User';
     
     // Log that they opened the page
