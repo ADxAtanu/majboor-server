@@ -90,6 +90,11 @@ app.get('/track-download', (req, res) => {
     res.redirect(AUDIO_DIRECT_URL);
 });
 
+// 👇 4. NEW: Lightweight Endpoint for Cron-job.org
+app.get('/ping', (req, res) => {
+    res.status(200).send('OK');
+});
+
 app.listen(PORT, () => {
     console.log(`Cloud Tracking Server running on port ${PORT}`);
 });
